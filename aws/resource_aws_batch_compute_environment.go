@@ -17,8 +17,6 @@ const (
 	FAILED    = "FAILED"
 )
 
-var reComputeEnvironmentName = regexp.MustCompile(`^[A-Za-z0-9_]*$`)
-
 func resourceAwsBatchComputeEnvironment() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceAwsBatchComputeEnvironmentCreate,
@@ -31,7 +29,7 @@ func resourceAwsBatchComputeEnvironment() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: ValidateBatchComputeEnvironmentName(),
+				ValidateFunc: validateBatchComputeEnvironmentName,
 			},
 			"compute_resources": {
 				Type:     schema.TypeList,
