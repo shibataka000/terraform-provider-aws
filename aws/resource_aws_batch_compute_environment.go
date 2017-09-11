@@ -12,10 +12,6 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 )
 
-const (
-	FAILED = "FAILED"
-)
-
 func resourceAwsBatchComputeEnvironment() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceAwsBatchComputeEnvironmentCreate,
@@ -396,11 +392,11 @@ func resourceAwsBatchComputeEnvironmentStatusRefreshFunc(d *schema.ResourceData,
 			},
 		})
 		if err != nil {
-			return nil, FAILED, err
+			return nil, "failed", err
 		}
 
 		if len(result.ComputeEnvironments) == 0 {
-			return nil, FAILED, fmt.Errorf("One compute environment is expected, but AWS return no compute environment")
+			return nil, "failed", fmt.Errorf("One compute environment is expected, but AWS return no compute environment")
 		}
 
 		computeEnvironment := result.ComputeEnvironments[0]
@@ -420,7 +416,7 @@ func resourceAwsBatchComputeEnvironmentDeleteRefreshFunc(d *schema.ResourceData,
 			},
 		})
 		if err != nil {
-			return nil, FAILED, err
+			return nil, "failed", err
 		}
 
 		if len(result.ComputeEnvironments) == 0 {
