@@ -144,3 +144,21 @@ func ValidateJsonString(v interface{}, k string) (ws []string, errors []error) {
 	}
 	return
 }
+
+
+func ValidateBatchComputeEnvironmentName() schema.SchemaValidateFunc {
+	return func(i interface{}, k string) (s []string, es []error) {
+		v, ok := i.(string)
+		if !ok {
+			es = append(es, fmt.Errorf("expected type of %s to be string", k))
+			return
+		}
+		
+		if !(reComputeEnvironmentName.MatchString(v) && len(v) <= 128) {
+			es = append(es, fmt.Errorf("computeEnvironmentName must be up to 128 letters (uppercase and lowercase), numbers, and underscores."))
+			return
+		}
+		
+		return
+	}
+}

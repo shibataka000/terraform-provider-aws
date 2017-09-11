@@ -31,7 +31,7 @@ func resourceAwsBatchComputeEnvironment() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: isCorrentComputeEnvironmentName,
+				ValidateFunc: ValidateBatchComputeEnvironmentName(),
 			},
 			"compute_resources": {
 				Type:     schema.TypeList,
@@ -433,19 +433,4 @@ func resourceAwsBatchComputeEnvironmentDeleteRefreshFunc(d *schema.ResourceData,
 		computeEnvironment := result.ComputeEnvironments[0]
 		return result, *(computeEnvironment.Status), nil
 	}
-}
-
-func isCorrentComputeEnvironmentName(i interface{}, k string) (s []string, es []error) {
-	v, ok := i.(string)
-	if !ok {
-		es = append(es, fmt.Errorf("expected type of %s to be string", k))
-		return
-	}
-
-	if !(reComputeEnvironmentName.MatchString(v) && len(v) <= 128) {
-		es = append(es, fmt.Errorf("computeEnvironmentName must be up to 128 letters (uppercase and lowercase), numbers, and underscores."))
-		return
-	}
-
-	return
 }
