@@ -102,7 +102,7 @@ func resourceAwsBatchComputeEnvironment() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ForceNew:     true,
-							ValidateFunc: validation.StringInSlice([]string{CRTypeEc2, CRTypeSpot}, true),
+							ValidateFunc: validation.StringInSlice([]string{batch.CRTypeEc2, batch.CRTypeSpot}, true),
 						},
 					},
 				},
@@ -115,14 +115,14 @@ func resourceAwsBatchComputeEnvironment() *schema.Resource {
 			"state": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{CEStateEnabled, CEStateDisabled}, true),
-				Default:      CEStateEnabled,
+				ValidateFunc: validation.StringInSlice([]string{batch.CEStateEnabled, batch.CEStateDisabled}, true),
+				Default:      batch.CEStateEnabled,
 			},
 			"type": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{CETypeManaged, CETypeUnmanaged}, true),
+				ValidateFunc: validation.StringInSlice([]string{batch.CETypeManaged, batch.CETypeUnmanaged}, true),
 			},
 			"arn": {
 				Type:     schema.TypeString,
@@ -162,7 +162,7 @@ func resourceAwsBatchComputeEnvironmentCreate(d *schema.ResourceData, meta inter
 		input.State = aws.String(v.(string))
 	}
 
-	if computeEnvironmentType == MANAGED {
+	if computeEnvironmentType == batch.CETypeManaged {
 		computeResources := d.Get("compute_resources").([]interface{})
 		if len(computeResources) == 0 {
 			return fmt.Errorf("One compute environment is expected, but no compute environments are set")
@@ -228,8 +228,8 @@ func resourceAwsBatchComputeEnvironmentCreate(d *schema.ResourceData, meta inter
 	d.SetId(computeEnvironmentName)
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{CEStatusCreating},
-		Target:     []string{CEStatusValid},
+		Pending:    []string{batch.CEStatusCreating},
+		Target:     []string{batch.CEStatusValid},
 		Refresh:    resourceAwsBatchComputeEnvironmentStatusRefreshFunc(d, meta),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
 		MinTimeout: 5 * time.Second,
@@ -305,7 +305,7 @@ func resourceAwsBatchComputeEnvironmentDelete(d *schema.ResourceData, meta inter
 
 	updateInput := &batch.UpdateComputeEnvironmentInput{
 		ComputeEnvironment: aws.String(computeEnvironmentName),
-		State:              aws.String(DISABLED),
+		State:              aws.String(batch.CEStateDisabled),
 	}
 
 	log.Printf("[DEBUG] Delete compute environment %s.\n", updateInput)
@@ -315,8 +315,8 @@ func resourceAwsBatchComputeEnvironmentDelete(d *schema.ResourceData, meta inter
 	}
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{CEStatusUpdating},
-		Target:     []string{CEStatusValid},
+		Pending:    []string{batch.CEStatusUpdating},
+		Target:     []string{batch.CEStatusValid},
 		Refresh:    resourceAwsBatchComputeEnvironmentStatusRefreshFunc(d, meta),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		MinTimeout: 5 * time.Second,
@@ -334,8 +334,8 @@ func resourceAwsBatchComputeEnvironmentDelete(d *schema.ResourceData, meta inter
 	}
 
 	stateConfForDelete := &resource.StateChangeConf{
-		Pending:    []string{CEStatusDeleting},
-		Target:     []string{CEStatusDeleted},
+		Pending:    []string{batch.CEStatusDeleting},
+		Target:     []string{batch.CEStatusDeleted},
 		Refresh:    resourceAwsBatchComputeEnvironmentDeleteRefreshFunc(d, meta),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		MinTimeout: 5 * time.Second,
@@ -427,7 +427,7 @@ func resourceAwsBatchComputeEnvironmentDeleteRefreshFunc(d *schema.ResourceData,
 		}
 
 		if len(result.ComputeEnvironments) == 0 {
-			return result, CEStatusDeleted, nil
+			return result, batch.CEStatusDeleted, nil
 		}
 
 		computeEnvironment := result.ComputeEnvironments[0]
