@@ -3,7 +3,6 @@ package aws
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	FAILED    = "FAILED"
+	FAILED = "FAILED"
 )
 
 func resourceAwsBatchComputeEnvironment() *schema.Resource {
